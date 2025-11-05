@@ -56,7 +56,11 @@ export async function signUp(formData: {
   // Create or get organization
   const orgSlug = formData.organizationName.toLowerCase().replace(/[^a-z0-9]+/g, "-")
 
-  const { data: existingOrg } = await supabase.from("organizations").select("id").eq("slug", orgSlug).single()
+  const { data: existingOrg, error: orgQueryError } = await supabase
+    .from("organizations")
+    .select("id")
+    .eq("slug", orgSlug)
+    .maybeSingle()
 
   let organizationId = existingOrg?.id
 
@@ -73,6 +77,11 @@ export async function signUp(formData: {
       .single()
 
     if (orgError) {
+      console.error("[v0] Organization creation error:", orgError)
+      return { error: "Failed to create organization: " + orgError.message }
+    }
+
+    if (!newOrg?.id) {
       return { error: "Failed to create organization" }
     }
 
@@ -91,7 +100,8 @@ export async function signUp(formData: {
   })
 
   if (profileError) {
-    return { error: "Failed to create profile" }
+    console.error("[v0] Profile creation error:", profileError)
+    return { error: "Failed to create profile: " + profileError.message }
   }
 
   return { success: true }

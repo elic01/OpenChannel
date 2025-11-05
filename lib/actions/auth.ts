@@ -88,20 +88,20 @@ export async function signUp(formData: {
     organizationId = newOrg.id
   }
 
-  // Create user profile
-  const { error: profileError } = await supabase.from("profiles").insert({
-    id: authData.user.id,
-    email: formData.email,
-    full_name: formData.fullName,
-    role: formData.role,
-    department: formData.department || null,
-    organization_id: organizationId,
-    is_active: true,
-  })
+  // Create or update user profile using the secure function
+  const { data: profileResult, error: profileError } = await supabase
+    .rpc('manage_profile', {
+      p_user_id: authData.user.id,
+      p_email: formData.email,
+      p_full_name: formData.fullName,
+      p_role: formData.role,
+      p_department: formData.department || null,
+      p_organization_id: organizationId
+    })
 
   if (profileError) {
     console.error("[v0] Profile creation error:", profileError)
-    return { error: "Failed to create profile: " + profileError.message }
+    return { error: "Failed to create/update profile: " + profileError.message }
   }
 
   return { success: true }

@@ -34,9 +34,11 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 
--- Drop existing problematic policies
+-- Drop ALL existing policies
 DROP POLICY IF EXISTS "users_view_own_organization" ON organizations;
 DROP POLICY IF EXISTS "admins_manage_organizations" ON organizations;
+DROP POLICY IF EXISTS "org_allow_public_read" ON organizations;
+DROP POLICY IF EXISTS "org_admins_manage" ON organizations;
 
 -- New policies using SECURITY DEFINER functions
 CREATE POLICY "org_allow_public_read" ON organizations
@@ -52,11 +54,16 @@ CREATE POLICY "org_admins_manage" ON organizations
 -- ============================================
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
--- Drop existing problematic policies
+-- Drop ALL existing policies
 DROP POLICY IF EXISTS "users_view_own_profile" ON profiles;
 DROP POLICY IF EXISTS "admins_view_org_profiles" ON profiles;
 DROP POLICY IF EXISTS "users_update_own_profile" ON profiles;
 DROP POLICY IF EXISTS "admins_manage_profiles" ON profiles;
+DROP POLICY IF EXISTS "profile_users_view_own" ON profiles;
+DROP POLICY IF EXISTS "profile_admins_view_all" ON profiles;
+DROP POLICY IF EXISTS "profile_users_update_own" ON profiles;
+DROP POLICY IF EXISTS "profile_admins_manage" ON profiles;
+DROP POLICY IF EXISTS "profile_allow_signup_insert" ON profiles;
 
 -- New policies using SECURITY DEFINER functions
 CREATE POLICY "profile_users_view_own" ON profiles

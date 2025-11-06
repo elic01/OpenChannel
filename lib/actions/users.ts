@@ -43,6 +43,7 @@ export async function createUser(userData: {
   fullName: string
   role: "pc_admin" | "employee"
   department?: string
+  organizationId?: string
 }) {
   const supabase = await createClient()
 
@@ -65,19 +66,46 @@ export async function createUser(userData: {
     throw new Error("Unauthorized: System admin privileges required")
   }
 
-  // Generate a temporary password
+  // Generate a temporary password for the user
   const tempPassword = Math.random().toString(36).slice(-12)
 
-  // Create auth user
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+  // Create auth user using Supabase Admin API
+  const adminSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const adminSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+  if (!adminSupabaseKey) {
+    throw new Error("SUPABASE_SERVICE_ROLE_KEY not configured")
+  }
+
+  if (!adminSupabaseUrl) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL not configured")
+  }
+
+  // Use the Supabase client with service role key
+  const { createClient: createAdminClient } = await import("@supabase/supabase-js")
+  const adminSupabase = createAdminClient(adminSupabaseUrl, adminSupabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+
+  const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
     email: userData.email,
     password: tempPassword,
     email_confirm: true,
   })
 
-  if (authError || !authData.user) {
-    throw new Error(`Failed to create auth user: ${authError?.message}`)
+  if (authError) {
+    throw new Error(`Failed to create auth user: ${authError.message}`)
   }
+
+  if (!authData.user) {
+    throw new Error("Failed to create auth user")
+  }
+
+  // Use provided organization or default to admin's organization
+  const organizationId = userData.organizationId || adminProfile.organization_id
 
   // Create profile using RPC function
   const { data: profileResult, error: profileError } = await supabase.rpc("manage_profile", {
@@ -86,7 +114,7 @@ export async function createUser(userData: {
     p_full_name: userData.fullName,
     p_role: userData.role,
     p_department: userData.department || null,
-    p_organization_id: adminProfile.organization_id,
+    p_organization_id: organizationId,
   })
 
   if (profileError) {

@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         category: category || null,
         source,
         phone_hash: phoneHash,
-        status: "new",
+        status: "pending",
         is_spam: isSpam,
       })
       .select()

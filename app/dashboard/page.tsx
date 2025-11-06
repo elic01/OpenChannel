@@ -179,7 +179,7 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent className="flex gap-4">
                 <Button asChild>
-                  <Link href="/">Submit Feedback</Link>
+                <Link href="/submit">Submit Feedback</Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link href="/dashboard/submissions">My Submissions</Link>

@@ -28,11 +28,25 @@ export default async function AdminLayout({
   }
 
   // Get user profile and check if admin
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  console.log(`[Admin Layout] Checking admin access for user: ${user.email}`)
+  const { data: profile, error: profileError } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
-  if (!profile || !["pc_admin", "system_admin"].includes(profile.role)) {
+  if (profileError) {
+    console.error("[Admin Layout] Profile fetch error:", profileError)
     redirect("/dashboard")
   }
+
+  if (!profile) {
+    console.log("[Admin Layout] No profile found")
+    redirect("/dashboard")
+  }
+
+  console.log(`[Admin Layout] User role: ${profile.role}`)
+  if (!["pc_admin", "system_admin"].includes(profile.role)) {
+    console.log(`[Admin Layout] Access denied, redirecting to dashboard`)
+    redirect("/dashboard")
+  }
+  console.log(`[Admin Layout] Access granted`)
 
   // Get organization
   const { data: organization } = await supabase

@@ -11,21 +11,32 @@ interface NavItem {
   title: string
   href: string
   icon: React.ComponentType<{ className?: string }>
+  employeeOnly?: boolean
   adminOnly?: boolean
   systemAdminOnly?: boolean
 }
 
 const navItems: NavItem[] = [
+  // Employee-only items
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    employeeOnly: true,
   },
   {
     title: "My Submissions",
     href: "/dashboard/submissions",
     icon: FileText,
+    employeeOnly: true,
   },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+    employeeOnly: true,
+  },
+  // Admin items (P&C admin and System admin)
   {
     title: "Feedback",
     href: "/admin/feedback",
@@ -45,6 +56,13 @@ const navItems: NavItem[] = [
     adminOnly: true,
   },
   {
+    title: "Settings",
+    href: "/admin/settings",
+    icon: Settings,
+    adminOnly: true,
+  },
+  // System admin only items
+  {
     title: "User Management",
     href: "/admin/users",
     icon: Users,
@@ -55,12 +73,6 @@ const navItems: NavItem[] = [
     href: "/admin/billing",
     icon: CreditCard,
     systemAdminOnly: true,
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-    adminOnly: true,
   },
 ]
 
@@ -73,8 +85,16 @@ export function DashboardNav({ isAdmin = false, isSystemAdmin = false }: Dashboa
   const pathname = usePathname()
 
   const filteredItems = navItems.filter((item) => {
+    // System admin only items
     if (item.systemAdminOnly) return isSystemAdmin
+
+    // Admin only items (for both P&C admin and system admin)
     if (item.adminOnly) return isAdmin || isSystemAdmin
+
+    // Employee only items
+    if (item.employeeOnly) return !isAdmin && !isSystemAdmin
+
+    // If no specific flags, show for everyone (fallback)
     return true
   })
 

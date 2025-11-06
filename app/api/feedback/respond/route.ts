@@ -51,12 +51,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to create response" }, { status: 500 })
     }
 
-    // Update feedback status to under_review if it's new
+    // Update feedback status to under_review if it's pending
     await supabase
       .from("feedback")
       .update({ status: "under_review", updated_at: new Date().toISOString() })
       .eq("id", feedbackId)
-      .eq("status", "new")
+      .eq("status", "pending")
 
     return NextResponse.json({ success: true, response })
   } catch (error) {

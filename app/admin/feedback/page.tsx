@@ -25,7 +25,7 @@ export default async function AdminFeedbackPage() {
     .from("pc_admin_feedback_view")
     .select("*")
     .eq("organization_id", profile.organization_id)
-    .eq("status", "new")
+    .eq("status", "pending")
     .order("created_at", { ascending: false })
 
   const { data: underReview } = await supabase

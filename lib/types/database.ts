@@ -1,6 +1,6 @@
 export type UserRole = "employee" | "pc_admin" | "system_admin"
 export type FeedbackSource = "web" | "ussd"
-export type FeedbackStatus = "new" | "under_review" | "addressed" | "archived"
+export type FeedbackStatus = "pending" | "under_review" | "addressed" | "archived"
 export type SentimentType = "positive" | "neutral" | "negative"
 export type PollType = "rating" | "multiple_choice" | "yes_no"
 

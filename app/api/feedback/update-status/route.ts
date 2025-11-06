@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const validStatuses = ["new", "under_review", "addressed", "archived"]
+    const validStatuses = ["pending", "under_review", "addressed", "archived"]
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 })
     }

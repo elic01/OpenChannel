@@ -84,7 +84,7 @@ export default async function FeedbackDetailPage({ params }: { params: Promise<{
                 )}
                 <Badge
                   variant={
-                    feedback.status === "new" ? "default" : feedback.status === "under_review" ? "secondary" : "outline"
+                    feedback.status === "pending" ? "default" : feedback.status === "under_review" ? "secondary" : "outline"
                   }
                 >
                   {feedback.status.replace(/_/g, " ")}

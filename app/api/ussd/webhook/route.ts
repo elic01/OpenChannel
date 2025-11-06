@@ -174,7 +174,7 @@ async function handleFeedbackConfirmation(input: string, phoneNumber: string) {
         category,
         source: "ussd",
         phone_hash: hashPhone(phoneNumber),
-        status: "new",
+        status: "pending",
         is_spam: false,
       })
 

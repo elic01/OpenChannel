@@ -34,8 +34,13 @@ export default function LoginPage() {
       if (signInError) throw signInError
       if (!data.user) throw new Error("No user returned from sign in")
 
-      // Use window.location for a hard redirect
-      window.location.href = "/dashboard"
+      // Get user profile to determine redirect destination
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single()
+
+      const redirectPath = profile && (profile.role === "pc_admin" || profile.role === "system_admin") ? "/admin" : "/dashboard"
+
+      // Use window.location for a hard redirect to ensure fresh page load
+      window.location.href = redirectPath
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message)

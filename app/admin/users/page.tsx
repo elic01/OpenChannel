@@ -2,9 +2,11 @@ import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users, UserCheck, UserX } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Users, UserCheck, UserX, Plus } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { TerminateUserButton } from "@/components/terminate-user-button"
+import Link from "next/link"
 
 export default async function AdminUsersPage() {
   const supabase = await createClient()
@@ -41,9 +43,17 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h2 className="mb-2 text-3xl font-bold tracking-tight">User Management</h2>
-        <p className="text-muted-foreground">Manage employee accounts and access</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="mb-2 text-3xl font-bold tracking-tight">User Management</h2>
+          <p className="text-muted-foreground">Manage employee accounts and access</p>
+        </div>
+        <Link href="/admin/users/invite">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Invite User
+          </Button>
+        </Link>
       </div>
 
       {/* Stats */}

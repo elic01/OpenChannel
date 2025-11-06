@@ -35,13 +35,18 @@ export async function signUp(formData: {
 }) {
   const supabase = await createClient()
 
+  if (formData.role !== "system_admin") {
+    return {
+      error: "Only system administrators can create accounts. Contact your administrator to create employee accounts.",
+    }
+  }
+
   // Create auth user
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: formData.email,
     password: formData.password,
     options: {
-      emailRedirectTo:
-        process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/callback`,
+      emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`,
     },
   })
 
@@ -88,20 +93,19 @@ export async function signUp(formData: {
     organizationId = newOrg.id
   }
 
-  // Create or update user profile using the secure function
-  const { data: profileResult, error: profileError } = await supabase
-    .rpc('manage_profile', {
-      p_user_id: authData.user.id,
-      p_email: formData.email,
-      p_full_name: formData.fullName,
-      p_role: formData.role,
-      p_department: formData.department || null,
-      p_organization_id: organizationId
-    })
+  // Create profile using the secure RPC function
+  const { data: profileResult, error: profileError } = await supabase.rpc("manage_profile", {
+    p_user_id: authData.user.id,
+    p_email: formData.email,
+    p_full_name: formData.fullName,
+    p_role: formData.role,
+    p_department: formData.department || null,
+    p_organization_id: organizationId,
+  })
 
   if (profileError) {
     console.error("[v0] Profile creation error:", profileError)
-    return { error: "Failed to create/update profile: " + profileError.message }
+    return { error: "Failed to create profile: " + profileError.message }
   }
 
   return { success: true }

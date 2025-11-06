@@ -30,7 +30,7 @@ export default function LoginPage() {
         email,
         password,
       })
-      
+
       if (signInError) throw signInError
       if (!data.user) throw new Error("No user returned from sign in")
 
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 </div>
                 <div className="mt-4 text-center text-sm">
                   <Link href="/" className="underline underline-offset-4">
-                    Back to feedback submission
+                    Back to home
                   </Link>
                 </div>
               </form>

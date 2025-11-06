@@ -23,7 +23,7 @@ export default function SignUpPage() {
     password: "",
     fullName: "",
     organizationName: "",
-    role: "employee",
+    role: "system_admin",
     department: "",
   })
 
@@ -118,11 +118,12 @@ export default function SignUpPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="employee">Employee</SelectItem>
-                  <SelectItem value="pc_admin">People & Culture Officer</SelectItem>
                   <SelectItem value="system_admin">System Administrator</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Only organization administrators can create accounts. Other team members will be added by your admin.
+              </p>
             </div>
 
             <div className="space-y-2">

@@ -1,34 +1,113 @@
-import { createClient } from "@/lib/supabase/server"
+"use client"
+
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart3, TrendingUp, MessageSquare, Users } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { BarChart3, TrendingUp, MessageSquare, Users, RefreshCw } from "lucide-react"
 
-export default async function AdminAnalyticsPage() {
-  const supabase = await createClient()
+export default function AdminAnalyticsPage() {
+  const [analytics, setAnalytics] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // Load user and profile
+  useEffect(() => {
+    const loadUserData = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return null
+      if (user) {
+        setUser(user)
+        const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+        setProfile(profile)
+      }
+      setLoading(false)
+    }
 
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+    loadUserData()
+  }, [])
 
-  if (!profile) return null
+  // Load analytics
+  const loadAnalytics = async () => {
+    if (!profile) return
 
-  // Get latest analytics
-  const { data: analytics } = await supabase
-    .from("feedback_analytics")
-    .select("*")
-    .eq("organization_id", profile.organization_id)
-    .order("period_start", { ascending: false })
-    .limit(1)
-    .single()
+    const supabase = createClient()
+
+    const { data: analytics } = await supabase
+      .from("feedback_analytics")
+      .select("*")
+      .eq("organization_id", profile.organization_id)
+      .order("period_start", { ascending: false })
+      .limit(1)
+      .single()
+
+    setAnalytics(analytics || null)
+  }
+
+  useEffect(() => {
+    if (profile) {
+      loadAnalytics()
+    }
+  }, [profile])
+
+  // Generate analytics
+  const handleGenerateAnalytics = async () => {
+    setGenerating(true)
+    try {
+      const response = await fetch("/api/analytics/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (response.ok) {
+        await loadAnalytics() // Reload analytics after generation
+      }
+    } catch (error) {
+      console.error("Failed to generate analytics:", error)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user || !profile) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Access denied</div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h2 className="mb-2 text-3xl font-bold tracking-tight">Analytics Dashboard</h2>
-        <p className="text-muted-foreground">Insights and trends from employee feedback</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="mb-2 text-3xl font-bold tracking-tight">Analytics Dashboard</h2>
+          <p className="text-muted-foreground">Insights and trends from employee feedback</p>
+        </div>
+        <Button onClick={handleGenerateAnalytics} disabled={generating}>
+          {generating ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Generate Analytics
+            </>
+          )}
+        </Button>
       </div>
 
       {analytics ? (

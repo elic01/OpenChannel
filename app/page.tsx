@@ -69,7 +69,7 @@ export default function MarketingPage() {
           </Badge>
           <h1 className="mb-6 text-balance text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
             Give Your Employees a{" "}
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
               Voice That Matters
             </span>
           </h1>

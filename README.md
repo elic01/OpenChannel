@@ -108,7 +108,7 @@ Refer to `DATABASE_SETUP.md` for detailed database initialization instructions. 
 
 The project is configured for deployment on Vercel with automatic sync from v0.app.
 
-Live deployment: [Vercel Link](https://vercel.com/lchinjex-gmailcoms-projects/v0-anonymous-feedback-system)
+Live deployment: [Vercel Link](https://v0-anonymous-feedback-system-kappa.vercel.app/)
 
 ## Contributing
 

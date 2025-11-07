@@ -50,15 +50,15 @@ OpenChannel is an anonymous feedback system built with Next.js and Supabase, des
 ### Installation
 
 1. Clone the repository:
-   ```bash
+   \`\`\`bash
    git clone https://github.com/elic01/OpenChannel.git
    cd OpenChannel
-   ```
+   \`\`\`
 
 2. Install dependencies:
-   ```bash
+   \`\`\`bash
    pnpm install
-   ```
+   \`\`\`
 
 3. Set up environment variables:
    - Copy `.env.example` to `.env.local`
@@ -70,9 +70,9 @@ OpenChannel is an anonymous feedback system built with Next.js and Supabase, des
    - Run the SQL scripts in Supabase SQL Editor
 
 5. Start the development server:
-   ```bash
+   \`\`\`bash
    pnpm dev
-   ```
+   \`\`\`
 
 ### Database Setup
 

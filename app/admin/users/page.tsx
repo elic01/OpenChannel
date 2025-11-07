@@ -31,12 +31,22 @@ export default async function AdminUsersPage() {
     )
   }
 
-  // Get all users in the organization
-  const { data: users } = await supabase
+  // Get all users - system admins see all users, others see only their org
+  let query = supabase
     .from("profiles")
     .select("*")
-    .eq("organization_id", profile.organization_id)
     .order("created_at", { ascending: false })
+
+  // System admins can see all users, others only their organization
+  if (profile.role !== "system_admin") {
+    query = query.eq("organization_id", profile.organization_id)
+  }
+
+  const { data: users, error: usersError } = await query
+
+  if (usersError) {
+    console.error("Error fetching users:", usersError)
+  }
 
   const activeUsers = users?.filter((u) => u.is_active) || []
   const terminatedUsers = users?.filter((u) => !u.is_active) || []

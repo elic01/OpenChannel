@@ -24,7 +24,7 @@ export default function FeedbackSuccessPage() {
             </p>
             <div className="space-y-2">
               <Button asChild className="w-full">
-                <Link href="/">Submit More Feedback</Link>
+              <Link href="/submit">Submit More Feedback</Link>
               </Button>
               <Button asChild variant="outline" className="w-full bg-transparent">
                 <Link href="/feedback/loop">View Feedback Loop</Link>

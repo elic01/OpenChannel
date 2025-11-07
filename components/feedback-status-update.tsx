@@ -14,8 +14,7 @@ interface FeedbackStatusUpdateProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: "new", label: "New" },
-  { value: "under_review", label: "Under Review" },
+  { value: "pending", label: "Pending" },
   { value: "addressed", label: "Addressed" },
   { value: "archived", label: "Archived" },
 ]

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatDistanceToNow } from "date-fns"
-import { MessageSquare, AlertCircle, CheckCircle2, Archive } from "lucide-react"
+import { MessageSquare, CheckCircle2, Archive } from "lucide-react"
 import Link from "next/link"
 
 export default async function AdminFeedbackPage() {
@@ -28,12 +28,7 @@ export default async function AdminFeedbackPage() {
     .eq("status", "pending")
     .order("created_at", { ascending: false })
 
-  const { data: underReview } = await supabase
-    .from("pc_admin_feedback_view")
-    .select("*")
-    .eq("organization_id", profile.organization_id)
-    .eq("status", "under_review")
-    .order("created_at", { ascending: false })
+
 
   const { data: addressed } = await supabase
     .from("pc_admin_feedback_view")
@@ -59,54 +54,43 @@ export default async function AdminFeedbackPage() {
       </div>
 
       {/* Stats Overview */}
-      <div className="mb-6 grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">New</CardTitle>
-            <MessageSquare className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{newFeedback?.length || 0}</div>
-          </CardContent>
-        </Card>
+      <div className="mb-6 grid gap-4 md:grid-cols-3">
+      <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">New</CardTitle>
+      <MessageSquare className="h-4 w-4 text-blue-600" />
+      </CardHeader>
+      <CardContent>
+      <div className="text-2xl font-bold">{newFeedback?.length || 0}</div>
+      </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Under Review</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{underReview?.length || 0}</div>
-          </CardContent>
-        </Card>
+      <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">Addressed</CardTitle>
+      <CheckCircle2 className="h-4 w-4 text-green-600" />
+      </CardHeader>
+      <CardContent>
+      <div className="text-2xl font-bold">{addressed?.length || 0}</div>
+      </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Addressed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{addressed?.length || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Spam</CardTitle>
-            <Archive className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{spamFeedback?.length || 0}</div>
-          </CardContent>
-        </Card>
+      <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardTitle className="text-sm font-medium">Spam</CardTitle>
+      <Archive className="h-4 w-4 text-red-600" />
+      </CardHeader>
+      <CardContent>
+      <div className="text-2xl font-bold">{spamFeedback?.length || 0}</div>
+      </CardContent>
+      </Card>
       </div>
 
       <Tabs defaultValue="new" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="new">New ({newFeedback?.length || 0})</TabsTrigger>
-          <TabsTrigger value="review">Under Review ({underReview?.length || 0})</TabsTrigger>
-          <TabsTrigger value="addressed">Addressed</TabsTrigger>
-          <TabsTrigger value="spam">Spam</TabsTrigger>
+        <TabsTrigger value="new">New ({newFeedback?.length || 0})</TabsTrigger>
+        <TabsTrigger value="addressed">Addressed</TabsTrigger>
+        <TabsTrigger value="spam">Spam</TabsTrigger>
         </TabsList>
 
         <TabsContent value="new" className="space-y-4">
@@ -164,60 +148,7 @@ export default async function AdminFeedbackPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="review" className="space-y-4">
-          {underReview && underReview.length > 0 ? (
-            underReview.map((feedback) => (
-              <Card key={feedback.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="text-base">
-                        Feedback #{feedback.id.slice(0, 8)}
-                        <Badge variant="secondary" className="ml-2">
-                          {feedback.source}
-                        </Badge>
-                      </CardTitle>
-                      <CardDescription>
-                        {formatDistanceToNow(new Date(feedback.created_at), { addSuffix: true })}
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      {feedback.category && <Badge variant="outline">{feedback.category.replace(/_/g, " ")}</Badge>}
-                      {feedback.sentiment && (
-                        <Badge
-                          variant="outline"
-                          className={
-                            feedback.sentiment === "positive"
-                              ? "border-green-600 text-green-600"
-                              : feedback.sentiment === "negative"
-                                ? "border-red-600 text-red-600"
-                                : "border-yellow-600 text-yellow-600"
-                          }
-                        >
-                          {feedback.sentiment}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm">{feedback.content}</p>
-                  <div className="flex gap-2">
-                    <Button asChild size="sm">
-                      <Link href={`/admin/feedback/${feedback.id}`}>Continue Review</Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <p>No feedback under review</p>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+        
 
         <TabsContent value="addressed" className="space-y-4">
           {addressed && addressed.length > 0 ? (

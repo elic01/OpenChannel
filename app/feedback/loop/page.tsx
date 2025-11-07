@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MessageSquare, TrendingUp, Users } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { MessageSquare, TrendingUp, Users, ArrowLeft } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import Link from "next/link"
 
 export default async function FeedbackLoopPage() {
   const supabase = await createClient()
@@ -43,10 +45,24 @@ export default async function FeedbackLoopPage() {
     .single()
 
   return (
-    <div className="min-h-svh bg-gradient-to-b from-background to-muted/20">
+  <div className="min-h-svh bg-gradient-to-b from-background to-muted/20">
+  {/* Header */}
+  <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div className="container mx-auto flex h-16 items-center justify-between px-4">
+  <div className="flex items-center gap-4">
+  <Link href="/dashboard">
+    <Button variant="ghost" size="sm">
+    <ArrowLeft className="mr-2 h-4 w-4" />
+      Back to Dashboard
+      </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-4xl">
-          {/* Header */}
+          {/* Page Header */}
           <div className="mb-8">
             <h1 className="mb-2 text-3xl font-bold tracking-tight">Feedback Loop</h1>
             <p className="text-muted-foreground">

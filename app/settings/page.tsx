@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -17,12 +17,37 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [dashboardUrl, setDashboardUrl] = useState("/dashboard")
 
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   })
+
+  // Determine correct dashboard URL based on user role
+  useEffect(() => {
+    const checkUserRole = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single()
+
+        if (profile?.role === "pc_admin" || profile?.role === "system_admin") {
+          setDashboardUrl("/admin")
+        } else {
+          setDashboardUrl("/dashboard")
+        }
+      }
+    }
+
+    checkUserRole()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,7 +95,7 @@ export default function SettingsPage() {
 
       // Redirect after a short delay
       setTimeout(() => {
-        router.push("/dashboard")
+        router.push(dashboardUrl)
       }, 2000)
 
     } catch (error: unknown) {
@@ -117,7 +142,7 @@ export default function SettingsPage() {
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
       <div className="mb-8 flex items-center gap-2">
-        <Link href="/dashboard">
+        <Link href={dashboardUrl}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
@@ -180,7 +205,7 @@ export default function SettingsPage() {
                   "Update Password"
                 )}
               </Button>
-              <Button type="button" variant="outline" onClick={() => router.push("/dashboard")}>
+              <Button type="button" variant="outline" onClick={() => router.push(dashboardUrl)}>
                 Cancel
               </Button>
             </div>

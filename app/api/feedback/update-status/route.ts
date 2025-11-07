@@ -5,13 +5,16 @@ export async function POST(request: Request) {
   try {
     const { feedbackId, status } = await request.json()
 
+    // Validate the status value
+
     if (!feedbackId || !status) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const validStatuses = ["pending", "under_review", "addressed", "archived"]
+    // Based on testing, the database constraint only allows these statuses
+    const validStatuses = ["pending", "addressed", "archived"]
     if (!validStatuses.includes(status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+      return NextResponse.json({ error: `Invalid status. Valid statuses: ${validStatuses.join(", ")}` }, { status: 400 })
     }
 
     const supabase = await createClient()
@@ -32,21 +35,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    // Verify feedback belongs to user's organization
-    const { data: feedback } = await supabase.from("feedback").select("organization_id").eq("id", feedbackId).single()
+    // Verify feedback belongs to user's organization and get current status
+    const { data: feedback } = await supabase.from("feedback").select("organization_id, status").eq("id", feedbackId).single()
 
     if (!feedback || feedback.organization_id !== profile.organization_id) {
       return NextResponse.json({ error: "Feedback not found" }, { status: 404 })
     }
 
-    // Update status
+    // If the status is the same, return success (no-op)
+    if (feedback.status === status) {
+      return NextResponse.json({ success: true })
+    }
+
+    // Update the status
     const { error } = await supabase
       .from("feedback")
       .update({ status, updated_at: new Date().toISOString() })
       .eq("id", feedbackId)
 
     if (error) {
-      console.error("[v0] Failed to update status:", error)
+      console.error("Failed to update feedback status:", error)
       return NextResponse.json({ error: "Failed to update status" }, { status: 500 })
     }
 

@@ -1,1 +1,3 @@
-export { default } from "./wrapper"
+import AcceptInviteWrapper from "./wrapper"
+
+export default AcceptInviteWrapper
